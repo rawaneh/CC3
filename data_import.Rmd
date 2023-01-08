@@ -223,3 +223,4 @@ library(ggplot2); packageVersion("ggplot2")
 #ps.top40 <- prune_taxa(top40, ps.top40)
 #plot_bar(ps.top40, x="Saison", fill="Family") + facet_wrap(~prof, scales="free_x")
 ```
+jhghbj
