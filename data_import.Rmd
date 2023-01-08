@@ -1,0 +1,225 @@
+---
+title: "R Notebook"
+output: github_document
+---
+
+```{bash}
+#wget -i data/url_data
+```
+```{r}
+library(rmarkdown)
+library(knitr)
+library(phyloseq)
+library(dada2)
+library(DECIPHER)
+library(phangorn)
+library(ggplot2)
+library(gridExtra)
+library(shiny)
+library(miniUI)
+library(caret)
+library(pls)
+library(e1071)
+library(ggplot2)
+library(randomForest)
+library("plyr"); packageVersion("plyr")
+library(dplyr)
+library(ggrepel)
+library(devtools)
+library(reshape2)
+library(PMA)
+library(ade4)
+library(ggnetwork)
+library(intergraph)
+library(scales)
+library(genefilter)
+library(impute)
+library(phyloseqGraphTest)
+library(Biostrings)
+library(dada2); packageVersion("dada2")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+path <- "~/CC3finalll/data/url_data" 
+list.files(path)
+```
+
+```{r}
+fnFs <- sort(list.files(path, pattern="_R1.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="_R2.fastq", full.names = TRUE))
+sample.names <- sapply(strsplit(basename(fnFs), "_R"), `[`, 1)
+```
+
+```{r}
+#plotQualityProfile(fnFs[1:2])
+```
+
+```{r}
+#plotQualityProfile(fnRs[1:2])
+```
+
+```{r}
+filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(path, "filtered", paste0(sample.names, "_R_filt.fastq.gz"))
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+```
+
+
+```{r}
+#errF <- learnErrors(filtFs, multithread=TRUE)
+```
+
+```{r}
+#errR <- learnErrors(filtRs, multithread=TRUE)
+```
+
+```{r}
+#plotErrors(errF, nominalQ=TRUE)
+```
+
+```{r}
+#dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+```
+
+```{r}
+#dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+```
+
+```{r}
+#mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+#head(mergers[[1]])
+```
+
+```{r}
+#seqtab <- makeSequenceTable(mergers)
+#dim(seqtab)
+```
+
+```{r}
+#table(nchar(getSequences(seqtab)))
+```
+
+```{r}
+#seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+#dim(seqtab.nochim)
+```
+
+```{r}
+#sum(seqtab.nochim)/sum(seqtab)
+```
+
+```{r}
+#getN <- function(x) sum(getUniques(x))
+#track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+#colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+#rownames(track) <- sample.names
+#head(track)
+```
+
+```{bash}
+#wget https://zenodo.org/record/4587955/files/silva_nr99_v138.1_train_set.fa.gz
+```
+
+```{r}
+#taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.1_train_set.fa.gz", multithread=TRUE)
+```
+
+```{r}
+#taxa.print <- taxa 
+#rownames(taxa.print) <- NULL
+#head(taxa.print)
+```
+
+```{r}
+library(phyloseq); packageVersion("phyloseq")
+```
+```{r}
+library(Biostrings); packageVersion("Biostrings")
+```
+
+```{r}
+library(ggplot2); packageVersion("ggplot2")
+```
+
+
+```{r}
+#theme_set(theme_bw())
+```
+
+```{r}
+#samples.out <- rownames(seqtab.nochim)
+#prof <- sapply(strsplit(samples.out, "_"), `[`, 2)
+#s_prof <- substr(prof,1,1)
+#day <- as.character(sapply(strsplit(samples.out, "_"), `[`, 3))
+#samdf <- data.frame(prof=s_prof, Day=day)
+#samdf$prof <- s_prof
+#samdf$Saison <- "Ete"
+#samdf$Saison[samdf$Day > "10sept14"] <- "Hiver"
+#rownames(samdf) <- samples.out
+```
+
+```{r}
+#ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+              # sample_data(samdf), 
+               #tax_table(taxa))
+```
+
+
+
+```{r}
+#plot_richness(ps, x="Saison", measures=c("Shannon", "Simpson"), color="prof")
+```
+
+
+```{r}
+#ps.prop <- transform_sample_counts(ps, function(otu) otu/sum(otu))
+#ord.nmds.bray <- ordinate(ps, method="NMDS", distance="bray")
+```
+
+
+```{r}
+#plot_ordination(ps.prop, ord.nmds.bray, color="Saison", shape="prof", title="Bray NMDS")
+```
+
+
+```{r}
+#top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+#ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+#ps.top20 <- prune_taxa(top20, ps.top20)
+#plot_bar(ps.top20, x="Saison", fill="Class") + facet_wrap(~prof, scales="free_x")
+```
+
+```{r}
+#top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+#ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+#ps.top20 <- prune_taxa(top20, ps.top20)
+#plot_bar(ps.top20, x="Saison", fill="Family") + facet_wrap(~prof, scales="free_x")
+```
+
+
+```{r}
+#top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20]
+#ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+#ps.top20 <- prune_taxa(top20, ps.top20)
+#plot_bar(ps.top20, x="Saison", fill="Genus") + facet_wrap(~prof, scales="free_x")
+```
+
+```{r}
+#top40 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:40]
+#ps.top40 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+#ps.top40 <- prune_taxa(top40, ps.top40)
+#plot_bar(ps.top40, x="Saison", fill="Family") + facet_wrap(~prof, scales="free_x")
+```
